@@ -9,10 +9,10 @@
         public float Weight { get; set; }
 
         public int ExerciseId { get; set; }
-        public Exercise Exercise { get; set; }
+        public Exercise Exercise { get; set; } = null!;
 
         public int WorkoutPlanId { get; set; }
-        public WorkoutPlan WorkoutPlan { get; set; }
+        public WorkoutPlan WorkoutPlan { get; set; } = null!;
 
     }
 }

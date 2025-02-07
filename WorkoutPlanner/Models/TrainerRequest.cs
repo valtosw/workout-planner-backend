@@ -4,13 +4,18 @@
     {
         public int Id { get; set; }
 
-        public string RequestStatus { get; set; }
+        public enum RequestStatus
+        {
+            Pending,
+            Accepted,
+            Rejected
+        }
 
         public int TrainerId { get; set; }
-        public Trainer Trainer { get; set; }
+        public Trainer Trainer { get; set; } = null!;
 
-        public int UserId { get; set; }
-        public User User { get; set; }
+        public int CustomerId { get; set; }
+        public Customer Customer { get; set; } = null!;
 
     }
 }
