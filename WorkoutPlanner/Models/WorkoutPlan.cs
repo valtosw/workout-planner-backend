@@ -9,10 +9,10 @@ namespace WorkoutPlanner.Models
         [MaxLength(50)]
         public required string Name { get; set; }
 
-        public int CreatedById { get; set; }
+        public string CreatedById { get; set; } = null!;
         public ApplicationUser CreatedBy { get; set; } = null!;
 
-        public int? AssignedToId { get; set; }
+        public string? AssignedToId { get; set; }
         public Customer? AssignedTo { get; set; }
 
         public ICollection<WorkoutPlanEntry> WorkoutPlanEntries { get; set; } = [];

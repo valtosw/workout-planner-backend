@@ -11,10 +11,10 @@
             Rejected
         }
 
-        public int TrainerId { get; set; }
+        public string TrainerId { get; set; } = null!;
         public Trainer Trainer { get; set; } = null!;
 
-        public int CustomerId { get; set; }
+        public string CustomerId { get; set; } = null!;
         public Customer Customer { get; set; } = null!;
 
     }
