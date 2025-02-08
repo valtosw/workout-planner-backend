@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using WorkoutPlanner.Helpers;
 using WorkoutPlanner.Models;
 
 namespace WorkoutPlanner.Data
@@ -18,6 +19,83 @@ namespace WorkoutPlanner.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<ApplicationUser>()
+                .UseTphMappingStrategy();
+
+            var (muscleGroups, exercises) = DatasetHandler.GetSeedData("C:\\Users\\valto\\source\\repos\\WorkoutPlanner\\WorkoutPlanner\\Helpers\\exercises_dataset.txt");
+
+            modelBuilder.Entity<MuscleGroup>().HasData(muscleGroups.GetRange(0, muscleGroups.Count - 1));
+            modelBuilder.Entity<Exercise>().HasData(exercises);
+
+            // Trainer - Customer many-to-many relationship
+            modelBuilder.Entity<Trainer>()
+                .HasMany(t => t.Customers)
+                .WithMany(c => c.Trainers)
+                .UsingEntity<Dictionary<string, object>>(
+                    "TrainerCustomer",
+                    j => j.HasOne<Customer>().WithMany().HasForeignKey("CustomerId"),
+                    j => j.HasOne<Trainer>().WithMany().HasForeignKey("TrainerId"),
+                    j => j.HasKey("CustomerId", "TrainerId")
+                );
+
+            // Trainer - TrainerRequest one-to-many relationship
+            modelBuilder.Entity<Trainer>()
+                .HasMany(t => t.ReceivedRequests)
+                .WithOne(r => r.Trainer)
+                .HasForeignKey(r => r.TrainerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Customer - TrainerRequest one-to-many relationship
+            modelBuilder.Entity<Customer>()
+                .HasMany(c => c.SentRequests)
+                .WithOne(r => r.Customer)
+                .HasForeignKey(r => r.CustomerId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Customer - ProgressLog one-to-many relationship
+            modelBuilder.Entity<Customer>()
+                .HasMany(c => c.ProgressLogs)
+                .WithOne(pl => pl.Customer)
+                .HasForeignKey(pl => pl.CustomerId);
+
+            // Exercise - ProgressLog one-to-many relationship
+            modelBuilder.Entity<Exercise>()
+                .HasMany(e => e.ProgressLogs)
+                .WithOne(pl => pl.Exercise)
+                .HasForeignKey(pl => pl.ExerciseId);
+
+            // WorkoutPlan - WorkoutPlanEntry one-to-many relationship
+            modelBuilder.Entity<WorkoutPlan>()
+                .HasMany(wp => wp.WorkoutPlanEntries)
+                .WithOne(wpe => wpe.WorkoutPlan)
+                .HasForeignKey(wpe => wpe.WorkoutPlanId);
+
+            // Exercise - WorkoutPlanEntry one-to-many relationship
+            modelBuilder.Entity<Exercise>()
+                .HasMany(e => e.WorkoutPlanEntries)
+                .WithOne(wpe => wpe.Exercise)
+                .HasForeignKey(wpe => wpe.ExerciseId);
+
+            modelBuilder.Entity<WorkoutPlan>()
+                .HasOne(wp => wp.CreatedBy)
+                .WithMany()
+                .HasForeignKey(wp => wp.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<WorkoutPlan>()
+               .HasOne(wp => wp.AssignedTo)
+               .WithMany(c => c.WorkoutPlans)
+               .HasForeignKey(wp => wp.AssignedToId)
+               .OnDelete(DeleteBehavior.SetNull);
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseMySql("server=localhost;database=workoutplannerdb;user=root;password=;",
+                new MySqlServerVersion(new Version(8, 0, 41)),
+                options => options.MaxBatchSize(1000)
+            );
         }
     }
 }
