@@ -25,7 +25,7 @@ namespace WorkoutPlanner.Data
 
             var (muscleGroups, exercises) = DatasetHandler.GetSeedData("C:\\Users\\valto\\source\\repos\\WorkoutPlanner\\WorkoutPlanner\\Helpers\\exercises_dataset.txt");
 
-            modelBuilder.Entity<MuscleGroup>().HasData(muscleGroups.GetRange(0, muscleGroups.Count - 1));
+            modelBuilder.Entity<MuscleGroup>().HasData(muscleGroups);
             modelBuilder.Entity<Exercise>().HasData(exercises);
 
             // Trainer - Customer many-to-many relationship
@@ -88,14 +88,6 @@ namespace WorkoutPlanner.Data
                .WithMany(c => c.WorkoutPlans)
                .HasForeignKey(wp => wp.AssignedToId)
                .OnDelete(DeleteBehavior.SetNull);
-        }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseMySql("server=localhost;database=workoutplannerdb;user=root;password=;",
-                new MySqlServerVersion(new Version(8, 0, 41)),
-                options => options.MaxBatchSize(1000)
-            );
         }
     }
 }
