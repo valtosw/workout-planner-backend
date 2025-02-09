@@ -28,10 +28,19 @@ namespace WorkoutPlanner.Helpers
                 {
                     value = muscleGroupId++;
                     muscleGroupsDict[muscleGroupName] = value;
-                    muscleGroups.Add(new MuscleGroup { Id = muscleGroupsDict[muscleGroupName], Name = muscleGroupName });
+                    muscleGroups.Add(new MuscleGroup
+                    {
+                        Id = muscleGroupsDict[muscleGroupName],
+                        Name = muscleGroupName
+                    });
                 }
 
-                exercises.Add(new Exercise { Id = exerciseId++, Name = exerciseName, MuscleGroupId = value });
+                exercises.Add(new Exercise
+                {
+                    Id = exerciseId++,
+                    Name = exerciseName,
+                    MuscleGroupId = value
+                });
             }
 
             return (muscleGroups, exercises);
