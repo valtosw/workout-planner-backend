@@ -1,49 +1,53 @@
-﻿using System.Reflection.Metadata.Ecma335;
-using WorkoutPlanner.Models;
+﻿using WorkoutPlanner.Models;
 
 namespace WorkoutPlanner.Helpers
 {
     public class DatasetHandler
     {
-        public static (List<MuscleGroup>, List<Exercise>) GetSeedData(string datasetPath)
+        public static (List<MuscleGroup>, List<Exercise>) GetSeedData(string filePath)
         {
-            var lines = File.ReadAllLines(datasetPath);
-
-            var muscleGroupsDict = new Dictionary<string, int>();
+            var muscleGroupsDict = new Dictionary<string, MuscleGroup>();
             var exercises = new List<Exercise>();
-            var muscleGroups = new List<MuscleGroup>();
 
-            int muscleGroupId = 1;
-            int exerciseId = 1;
+            var lines = File.ReadAllLines(filePath);
 
-            foreach (var line in lines.Distinct())
+            int muscleGroupIdCounter = 1;
+            int exerciseIdCounter = 1;
+
+            foreach (var line in lines)
             {
                 var parts = line.Split(',');
-                if (parts.Length != 2) continue;
 
-                var exerciseName = parts[0].Trim();
-                var muscleGroupName = parts[1].Trim();
+                if (parts.Length != 2)
+                    continue;
 
-                if (!muscleGroupsDict.TryGetValue(muscleGroupName, out int value))
+                string exerciseName = parts[0].Trim();
+                string muscleGroupName = parts[1].Trim();
+
+                if (!muscleGroupsDict.TryGetValue(muscleGroupName, out var muscleGroup))
                 {
-                    value = muscleGroupId++;
-                    muscleGroupsDict[muscleGroupName] = value;
-                    muscleGroups.Add(new MuscleGroup
+                    muscleGroup = new MuscleGroup
                     {
-                        Id = muscleGroupsDict[muscleGroupName],
-                        Name = muscleGroupName
-                    });
+                        Id = muscleGroupIdCounter++,
+                        Name = muscleGroupName,
+                        Exercises = []
+                    };
+                    muscleGroupsDict[muscleGroupName] = muscleGroup;
                 }
 
-                exercises.Add(new Exercise
+                var exercise = new Exercise
                 {
-                    Id = exerciseId++,
+                    Id = exerciseIdCounter++,
                     Name = exerciseName,
-                    MuscleGroupId = value
-                });
+                    MuscleGroupId = muscleGroup.Id,
+                    MuscleGroup = muscleGroup
+                };
+
+                muscleGroup.Exercises.Add(exercise);
+                exercises.Add(exercise);
             }
 
-            return (muscleGroups, exercises);
+            return (muscleGroupsDict.Values.ToList(), exercises);
         }
     }
 }
