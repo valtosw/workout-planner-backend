@@ -23,11 +23,6 @@ namespace WorkoutPlanner.Data
             modelBuilder.Entity<ApplicationUser>()
                 .UseTphMappingStrategy();
 
-            var (muscleGroups, exercises) = DatasetHandler.GetSeedData("C:\\Users\\valto\\source\\repos\\WorkoutPlanner\\WorkoutPlanner\\Helpers\\exercises_dataset.txt");
-
-            modelBuilder.Entity<MuscleGroup>().HasData(muscleGroups);
-            modelBuilder.Entity<Exercise>().HasData(exercises);
-
             // Trainer - Customer many-to-many relationship
             modelBuilder.Entity<Trainer>()
                 .HasMany(t => t.Customers)
