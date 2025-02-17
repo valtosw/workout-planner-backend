@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using WorkoutPlanner.Helpers;
 using WorkoutPlanner.Models;
 
 namespace WorkoutPlanner.Data
