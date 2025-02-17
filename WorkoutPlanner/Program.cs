@@ -28,6 +28,8 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+DataSeeder.PopulateDb(app);
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
