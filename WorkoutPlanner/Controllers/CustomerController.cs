@@ -11,7 +11,7 @@ namespace WorkoutPlanner.Controllers
     public class CustomerController(AppDbContext context) : ControllerBase
     {
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MuscleGroup>>> GetAllCustomers()
+        public async Task<ActionResult<IEnumerable<Customer>>> GetAllCustomers()
         {
             var customers = await context.Customers.ToListAsync();
 
