@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WorkoutPlanner.Data;
 using WorkoutPlanner.Models;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using WorkoutPlanner.Helpers;
+using WorkoutPlanner.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,5 +42,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapMuscleGroupEndpoints();
 
 app.Run();
