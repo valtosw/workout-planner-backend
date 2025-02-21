@@ -438,6 +438,12 @@ namespace WorkoutPlanner.Migrations
                     b.Property<string>("InstagramLink")
                         .HasColumnType("longtext");
 
+                    b.Property<bool>("IsPosted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("PlaceOfWork")
                         .HasColumnType("longtext");
 

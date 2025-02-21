@@ -12,8 +12,8 @@ using WorkoutPlanner.Data;
 namespace WorkoutPlanner.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250216211626_NewMigration")]
-    partial class NewMigration
+    [Migration("20250221123717_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -439,6 +439,12 @@ namespace WorkoutPlanner.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("InstagramLink")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("IsPosted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Location")
                         .HasColumnType("longtext");
 
                     b.Property<string>("PlaceOfWork")
