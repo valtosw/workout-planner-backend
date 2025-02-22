@@ -5,7 +5,7 @@ namespace WorkoutPlanner.Models
     public class Trainer : ApplicationUser
     {
         public string? Bio { get; set; }
-        public string? Experience { get; set; }
+        public int? Experience { get; set; }
         public string? Location { get; set; }
         public string? PlaceOfWork { get; set; }
         public decimal TrainingPrice { get; set; }
@@ -13,6 +13,7 @@ namespace WorkoutPlanner.Models
         public string? FacebookLink { get; set; }
         public string? TelegramLink { get; set; }
         public bool IsPosted { get; set; }
+        public bool IsCertified { get; set; }
 
         public ICollection<Customer> Customers { get; set; } = [];
         public ICollection<TrainerRequest> ReceivedRequests { get; set; } = [];
