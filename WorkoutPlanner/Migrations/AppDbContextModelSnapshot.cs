@@ -429,14 +429,17 @@ namespace WorkoutPlanner.Migrations
                     b.Property<string>("Bio")
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Experience")
-                        .HasColumnType("longtext");
+                    b.Property<int?>("Experience")
+                        .HasColumnType("int");
 
                     b.Property<string>("FacebookLink")
                         .HasColumnType("longtext");
 
                     b.Property<string>("InstagramLink")
                         .HasColumnType("longtext");
+
+                    b.Property<bool>("IsCertified")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsPosted")
                         .HasColumnType("tinyint(1)");
