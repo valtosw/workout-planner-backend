@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Collections;
 using System.Threading.Tasks;
 using WorkoutPlanner.Data;
 using WorkoutPlanner.Models;
@@ -12,11 +13,60 @@ namespace WorkoutPlanner.Controllers
     [ApiController]
     public class TrainerController(AppDbContext context) : ControllerBase
     {
+
         // GET: api/<TrainerController>
-        [HttpGet]
-        public async Task<IEnumerable<Trainer>> GetAllTrainers()
+        [HttpGet("posted")]
+        public async Task<IEnumerable<Trainer>> GetAllPostedTrainers()
         {
-            var trainers = await context.Trainers.ToListAsync();
+            var trainers = await context.Trainers
+                .Where(t => t.IsPosted == true)
+                .ToListAsync();
+
+            return trainers;
+        }
+
+        [HttpGet("filter")]
+        public async Task<IEnumerable<Trainer>> GetFilteredTrainers(
+            [FromQuery] string? experience,
+            [FromQuery] decimal? minPrice,
+            [FromQuery] decimal? maxPrice,
+            [FromQuery] bool? isCertified,
+            [FromQuery] string? location)
+        {
+            var trainersQuery = context.Trainers.Where(t => t.IsPosted == true).AsQueryable();
+
+            if (!string.IsNullOrEmpty(experience))
+            {
+                if (experience.EndsWith("+") && int.TryParse(experience.TrimEnd('+'), out var years))
+                {
+                    trainersQuery = trainersQuery.Where(t =>
+                        t.Experience != null &&
+                        t.Experience >= years
+                    );
+                }
+            }
+
+            if (minPrice.HasValue)
+            {
+                trainersQuery = trainersQuery.Where(t => t.TrainingPrice >= minPrice.Value);
+            }
+
+            if (maxPrice.HasValue)
+            {
+                trainersQuery = trainersQuery.Where(t => t.TrainingPrice <= maxPrice.Value);
+            }
+
+            if (isCertified.HasValue)
+            {
+                trainersQuery = trainersQuery.Where(t => t.IsCertified == isCertified.Value);
+            }
+
+            if (!string.IsNullOrEmpty(location))
+            {
+                trainersQuery = trainersQuery.Where(t => t.Location!.Contains(location));
+            }
+
+            var trainers = await trainersQuery.ToListAsync();
 
             return trainers;
         }
