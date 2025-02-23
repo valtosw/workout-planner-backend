@@ -72,29 +72,18 @@ namespace WorkoutPlanner.Controllers
             return maxPrice;
         }
 
-        //// GET api/<TrainerController>/5
-        //[HttpGet("{id}")]
-        //public string Get(int id)
-        //{
-        //    return "value";
-        //}
+        [HttpPost]
+        public async Task<IResult> CreateTrainer([FromBody] Trainer trainerToCreate)
+        {
+            if (trainerToCreate is null)
+            {
+                return Results.BadRequest("Trainer object is null");
+            }
 
-        //// POST api/<TrainerController>
-        //[HttpPost]
-        //public void Post([FromBody]string value)
-        //{
-        //}
+            context.Trainers.Add(trainerToCreate);
+            await context.SaveChangesAsync();
 
-        //// PUT api/<TrainerController>/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody]string value)
-        //{
-        //}
-
-        //// DELETE api/<TrainerController>/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
+            return Results.CreatedAtRoute("GetTrainer", new { id = trainerToCreate.Id }, trainerToCreate);
+        }
     }
 }
