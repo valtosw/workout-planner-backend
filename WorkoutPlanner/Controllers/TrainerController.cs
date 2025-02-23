@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 using WorkoutPlanner.Data;
 using WorkoutPlanner.Models;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace WorkoutPlanner.Controllers
 {
     [Route("api/[controller]")]
@@ -14,7 +12,6 @@ namespace WorkoutPlanner.Controllers
     public class TrainerController(AppDbContext context) : ControllerBase
     {
 
-        // GET: api/<TrainerController>
         [HttpGet("posted")]
         public async Task<IEnumerable<Trainer>> GetAllPostedTrainers()
         {
@@ -25,9 +22,9 @@ namespace WorkoutPlanner.Controllers
             return trainers;
         }
 
-        [HttpGet("filter")]
+        [HttpGet("filtered")]
         public async Task<IEnumerable<Trainer>> GetFilteredTrainers(
-            [FromQuery] string? experience,
+            [FromQuery] int? experience,
             [FromQuery] decimal? minPrice,
             [FromQuery] decimal? maxPrice,
             [FromQuery] bool? isCertified,
@@ -35,15 +32,9 @@ namespace WorkoutPlanner.Controllers
         {
             var trainersQuery = context.Trainers.Where(t => t.IsPosted == true).AsQueryable();
 
-            if (!string.IsNullOrEmpty(experience))
+            if (experience.HasValue)
             {
-                if (experience.EndsWith("+") && int.TryParse(experience.TrimEnd('+'), out var years))
-                {
-                    trainersQuery = trainersQuery.Where(t =>
-                        t.Experience != null &&
-                        t.Experience >= years
-                    );
-                }
+                trainersQuery = trainersQuery.Where(t => t.Experience >= experience.Value);
             }
 
             if (minPrice.HasValue)
@@ -69,6 +60,16 @@ namespace WorkoutPlanner.Controllers
             var trainers = await trainersQuery.ToListAsync();
 
             return trainers;
+        }
+
+        [HttpGet("max-price")]
+        public async Task<decimal> GetMaxTrainingPrice()
+        {
+            var maxPrice = await context.Trainers
+                .Where(t => t.IsPosted == true)
+                .MaxAsync(t => t.TrainingPrice);
+
+            return maxPrice;
         }
 
         //// GET api/<TrainerController>/5
