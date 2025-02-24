@@ -71,19 +71,5 @@ namespace WorkoutPlanner.Controllers
 
             return maxPrice;
         }
-
-        [HttpPost]
-        public async Task<IResult> CreateTrainer([FromBody] Trainer trainerToCreate)
-        {
-            if (trainerToCreate is null)
-            {
-                return Results.BadRequest("Trainer object is null");
-            }
-
-            context.Trainers.Add(trainerToCreate);
-            await context.SaveChangesAsync();
-
-            return Results.CreatedAtRoute("GetTrainer", new { id = trainerToCreate.Id }, trainerToCreate);
-        }
     }
 }
