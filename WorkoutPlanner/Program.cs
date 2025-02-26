@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using WorkoutPlanner.Data;
 using WorkoutPlanner.Models;
 using WorkoutPlanner.Helpers;
-using WorkoutPlanner.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +16,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
             maxRetryDelay: TimeSpan.FromSeconds(30),
             errorNumbersToAdd: null)));
 
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
@@ -26,10 +29,6 @@ builder.Services.AddCors(options =>
             .AllowAnyHeader();
     });
 });
-
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<AppDbContext>()
-    .AddDefaultTokenProviders();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -52,7 +51,20 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+    if (!await roleManager.RoleExistsAsync("Trainer"))
+    {
+        await roleManager.CreateAsync(new IdentityRole("Trainer"));
+    }
+    if (!await roleManager.RoleExistsAsync("Customer"))
+    {
+        await roleManager.CreateAsync(new IdentityRole("Customer"));
+    }
+}
 
 app.Run();
