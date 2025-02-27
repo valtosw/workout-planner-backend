@@ -12,8 +12,8 @@ using WorkoutPlanner.Data;
 namespace WorkoutPlanner.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250222204917_NewNewMigration")]
-    partial class NewNewMigration
+    [Migration("20250227151202_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
