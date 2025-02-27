@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using WorkoutPlanner.Data;
 using WorkoutPlanner.Models;
 using WorkoutPlanner.Helpers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +23,26 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]!)),
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        RequireExpirationTime = true,
+        ValidateLifetime = true
+    };
+});
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
@@ -35,6 +58,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 DataSeeder.PopulateDb(app);
@@ -49,22 +74,22 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-using (var scope = app.Services.CreateScope())
-{
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+//using (var scope = app.Services.CreateScope())
+//{
+//    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-    if (!await roleManager.RoleExistsAsync("Trainer"))
-    {
-        await roleManager.CreateAsync(new IdentityRole("Trainer"));
-    }
-    if (!await roleManager.RoleExistsAsync("Customer"))
-    {
-        await roleManager.CreateAsync(new IdentityRole("Customer"));
-    }
-}
+//    if (!await roleManager.RoleExistsAsync("Trainer"))
+//    {
+//        await roleManager.CreateAsync(new IdentityRole("Trainer"));
+//    }
+//    if (!await roleManager.RoleExistsAsync("Customer"))
+//    {
+//        await roleManager.CreateAsync(new IdentityRole("Customer"));
+//    }
+//}
 
 app.Run();
