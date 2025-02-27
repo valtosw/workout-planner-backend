@@ -12,7 +12,7 @@ namespace WorkoutPlanner.Controllers
     public class TrainerController(AppDbContext context) : ControllerBase
     {
 
-        [HttpGet("posted")]
+        [HttpGet("Posted")]
         public async Task<IEnumerable<Trainer>> GetAllPostedTrainers()
         {
             var trainers = await context.Trainers
@@ -22,7 +22,7 @@ namespace WorkoutPlanner.Controllers
             return trainers;
         }
 
-        [HttpGet("filtered")]
+        [HttpGet("Filtered")]
         public async Task<IEnumerable<Trainer>> GetFilteredTrainers(
             [FromQuery] int? experience,
             [FromQuery] decimal? minPrice,
@@ -62,7 +62,7 @@ namespace WorkoutPlanner.Controllers
             return trainers;
         }
 
-        [HttpGet("max-price")]
+        [HttpGet("MaxPrice")]
         public async Task<decimal> GetMaxTrainingPrice()
         {
             var maxPrice = await context.Trainers
