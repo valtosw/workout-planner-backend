@@ -1,10 +1,11 @@
-﻿using WorkoutPlanner.Models;
+﻿using System.Text.RegularExpressions;
+using WorkoutPlanner.Models;
 
 namespace WorkoutPlanner.Helpers
 {
     public class DatasetHandler
     {
-        public static (List<MuscleGroup>, List<Exercise>) GetSeedData(string filePath)
+        public static (List<MuscleGroup>, List<Exercise>) GetMuscleGroupAndExerciseData(string filePath)
         {
             var muscleGroupsDict = new Dictionary<string, MuscleGroup>();
             var exercises = new List<Exercise>();
@@ -48,6 +49,25 @@ namespace WorkoutPlanner.Helpers
             }
 
             return (muscleGroupsDict.Values.ToList(), exercises);
+        }
+
+        public static List<Country> GetCountryData(string filePath)
+        {
+            var countries = new List<Country>();
+            var lines = File.ReadAllLines(filePath);
+            var regex = new Regex(@"^(.*?)\s\([A-Z]{2}\)$"); 
+
+            int id = 1;
+            foreach (var line in lines)
+            {
+                var match = regex.Match(line);
+                if (match.Success)
+                {
+                    countries.Add(new Country { Id = id++, Name = match.Groups[1].Value });
+                }
+            }
+
+            return countries;
         }
     }
 }

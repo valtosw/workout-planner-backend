@@ -14,7 +14,7 @@ namespace WorkoutPlanner.Helpers
         {
             if (!context.MuscleGroups.Any())
             {
-                var muscleGroups = DatasetHandler.GetSeedData(Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "exercises_dataset.txt")).Item1;
+                var muscleGroups = DatasetHandler.GetMuscleGroupAndExerciseData(Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "exercises_dataset.txt")).Item1;
 
                 context.MuscleGroups.AddRange(muscleGroups);
                 context.SaveChanges();
@@ -22,9 +22,17 @@ namespace WorkoutPlanner.Helpers
 
             if (!context.Exercises.Any())
             {
-                var exercises = DatasetHandler.GetSeedData(Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "exercises_dataset.txt")).Item2;
+                var exercises = DatasetHandler.GetMuscleGroupAndExerciseData(Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "exercises_dataset.txt")).Item2;
 
                 context.Exercises.AddRange(exercises);
+                context.SaveChanges();
+            }
+
+            if (!context.Countries.Any())
+            {
+                var countries = DatasetHandler.GetCountryData(Path.Combine(Directory.GetCurrentDirectory(), "Helpers", "countries_dataset.txt"));
+
+                context.Countries.AddRange(countries);
                 context.SaveChanges();
             }
         }
