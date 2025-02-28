@@ -255,6 +255,23 @@ namespace WorkoutPlanner.Migrations
                     b.UseTphMappingStrategy();
                 });
 
+            modelBuilder.Entity("WorkoutPlanner.Models.Country", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Countries");
+                });
+
             modelBuilder.Entity("WorkoutPlanner.Models.Exercise", b =>
                 {
                     b.Property<int>("Id")
@@ -429,7 +446,13 @@ namespace WorkoutPlanner.Migrations
                     b.Property<string>("Bio")
                         .HasColumnType("longtext");
 
-                    b.Property<int?>("Experience")
+                    b.Property<string>("City")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("CountryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Experience")
                         .HasColumnType("int");
 
                     b.Property<string>("FacebookLink")
@@ -444,9 +467,6 @@ namespace WorkoutPlanner.Migrations
                     b.Property<bool>("IsPosted")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<string>("Location")
-                        .HasColumnType("longtext");
-
                     b.Property<string>("PlaceOfWork")
                         .HasColumnType("longtext");
 
@@ -455,6 +475,8 @@ namespace WorkoutPlanner.Migrations
 
                     b.Property<decimal>("TrainingPrice")
                         .HasColumnType("decimal(65,30)");
+
+                    b.HasIndex("CountryId");
 
                     b.HasDiscriminator().HasValue("Trainer");
                 });
@@ -613,6 +635,22 @@ namespace WorkoutPlanner.Migrations
                     b.Navigation("Exercise");
 
                     b.Navigation("WorkoutPlan");
+                });
+
+            modelBuilder.Entity("WorkoutPlanner.Models.Trainer", b =>
+                {
+                    b.HasOne("WorkoutPlanner.Models.Country", "Country")
+                        .WithMany("Trainers")
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Country");
+                });
+
+            modelBuilder.Entity("WorkoutPlanner.Models.Country", b =>
+                {
+                    b.Navigation("Trainers");
                 });
 
             modelBuilder.Entity("WorkoutPlanner.Models.Exercise", b =>
