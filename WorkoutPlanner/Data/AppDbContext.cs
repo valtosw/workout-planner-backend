@@ -8,6 +8,7 @@ namespace WorkoutPlanner.Data
     {
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Trainer> Trainers { get; set; }
+        public DbSet<Country> Countries { get; set; }
         public DbSet<TrainerRequest> TrainerRequests { get; set; }
         public DbSet<WorkoutPlan> WorkoutPlans { get; set; }
         public DbSet<ProgressLog> ProgressLogs { get; set; }
@@ -39,6 +40,13 @@ namespace WorkoutPlanner.Data
                 .WithOne(r => r.Trainer)
                 .HasForeignKey(r => r.TrainerId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            // Trainer - Country many-to-one relationship
+            modelBuilder.Entity<Trainer>()
+                .HasOne(t => t.Country)
+                .WithMany(c => c.Trainers)
+                .HasForeignKey(t => t.CountryId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Customer - TrainerRequest one-to-many relationship
             modelBuilder.Entity<Customer>()
