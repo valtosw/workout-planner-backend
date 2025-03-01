@@ -6,7 +6,6 @@ namespace WorkoutPlanner.Models
     {
         public string? Bio { get; set; }
         public int Experience { get; set; }
-        //public string? Location { get; set; }
 
         public string? City { get; set; }
         public int CountryId { get; set; }
