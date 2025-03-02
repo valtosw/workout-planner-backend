@@ -17,11 +17,7 @@ namespace WorkoutPlanner.Controllers
                 .Where(mg => mg.Name == muscleGroupName)
                 .FirstOrDefaultAsync();
 
-            if (muscleGroup is null)
-            {
-                return [];
-            }
-            return muscleGroup.Exercises.Select(e => e.Name);
+            return muscleGroup is null ? [] : muscleGroup.Exercises.Select(e => e.Name);
         }
     }
 }
