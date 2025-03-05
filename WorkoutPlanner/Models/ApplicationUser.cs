@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using WorkoutPlanner.Models.AuthModels;
 
 namespace WorkoutPlanner.Models
 {
@@ -12,5 +13,7 @@ namespace WorkoutPlanner.Models
         public required string LastName { get; set; }
 
         public string? ProfilePicture { get; set; }
+
+        public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
     }
 }
