@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using WorkoutPlanner.Models;
+using WorkoutPlanner.Models.AuthModels;
 
 namespace WorkoutPlanner.Data
 {
@@ -16,12 +17,20 @@ namespace WorkoutPlanner.Data
         public DbSet<MuscleGroup> MuscleGroups { get; set; }
         public DbSet<WorkoutPlanEntry> WorkoutPlanEntries { get; set; }
 
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<ApplicationUser>()
                 .UseTphMappingStrategy();
+
+            modelBuilder.Entity<RefreshToken>()
+                .HasOne(rt => rt.User)
+                .WithMany(u => u.RefreshTokens)
+                .HasForeignKey(rt => rt.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Trainer - Customer many-to-many relationship
             modelBuilder.Entity<Trainer>()
