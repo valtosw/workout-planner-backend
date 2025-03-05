@@ -255,6 +255,27 @@ namespace WorkoutPlanner.Migrations
                     b.UseTphMappingStrategy();
                 });
 
+            modelBuilder.Entity("WorkoutPlanner.Models.AuthModels.RefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
+                });
+
             modelBuilder.Entity("WorkoutPlanner.Models.Country", b =>
                 {
                     b.Property<int>("Id")
@@ -547,6 +568,17 @@ namespace WorkoutPlanner.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("WorkoutPlanner.Models.AuthModels.RefreshToken", b =>
+                {
+                    b.HasOne("WorkoutPlanner.Models.ApplicationUser", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("WorkoutPlanner.Models.Exercise", b =>
                 {
                     b.HasOne("WorkoutPlanner.Models.MuscleGroup", "MuscleGroup")
@@ -646,6 +678,11 @@ namespace WorkoutPlanner.Migrations
                         .IsRequired();
 
                     b.Navigation("Country");
+                });
+
+            modelBuilder.Entity("WorkoutPlanner.Models.ApplicationUser", b =>
+                {
+                    b.Navigation("RefreshTokens");
                 });
 
             modelBuilder.Entity("WorkoutPlanner.Models.Country", b =>
