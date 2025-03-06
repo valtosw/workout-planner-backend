@@ -55,7 +55,7 @@ namespace WorkoutPlanner.Data
                 .HasOne(t => t.Country)
                 .WithMany(c => c.Trainers)
                 .HasForeignKey(t => t.CountryId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.SetNull);
 
             // Customer - TrainerRequest one-to-many relationship
             modelBuilder.Entity<Customer>()
