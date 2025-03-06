@@ -8,7 +8,7 @@ namespace WorkoutPlanner.Models
         public int Experience { get; set; }
 
         public string? City { get; set; }
-        public int CountryId { get; set; }
+        public int? CountryId { get; set; }
 
         public string? PlaceOfWork { get; set; }
         public decimal TrainingPrice { get; set; }
