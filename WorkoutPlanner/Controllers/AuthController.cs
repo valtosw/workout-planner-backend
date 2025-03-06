@@ -36,7 +36,7 @@ namespace WorkoutPlanner.Controllers
                     FirstName = request.FirstName,
                     LastName = request.LastName,
                     Email = request.Email,
-                    UserName = $"{request.FirstName}{request.LastName}"
+                    UserName = request.Email,
                 };
             }
             else if (request.Role.Equals("trainer", StringComparison.CurrentCultureIgnoreCase))
@@ -46,7 +46,7 @@ namespace WorkoutPlanner.Controllers
                     FirstName = request.FirstName,
                     LastName = request.LastName,
                     Email = request.Email,
-                    UserName = $"{request.FirstName}{request.LastName}"
+                    UserName = request.Email,
                 };
             }
             else
@@ -78,7 +78,7 @@ namespace WorkoutPlanner.Controllers
 
         [Route("Login")]
         [HttpPost]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        public async Task<IActionResult> Login([FromBody] LoginDto request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(new { message = "Wrong login credentials", errors = ModelState });
@@ -91,10 +91,10 @@ namespace WorkoutPlanner.Controllers
             if (!await userManager.CheckPasswordAsync(user, request.Password))
                 return Unauthorized(new { message = "Wrong login or password." });
 
-            if (!await userManager.IsEmailConfirmedAsync(user))
-            {
-                return Unauthorized(new { message = "Email not confirmed." });
-            }
+            //if (!await userManager.IsEmailConfirmedAsync(user))
+            //{
+            //    return Unauthorized(new { message = "Email not confirmed." });
+            //}
 
             var claims = userManager.GetClaimsAsync(user).Result.ToList();
 
