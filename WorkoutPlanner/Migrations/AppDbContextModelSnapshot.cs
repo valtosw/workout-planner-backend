@@ -470,7 +470,7 @@ namespace WorkoutPlanner.Migrations
                     b.Property<string>("City")
                         .HasColumnType("longtext");
 
-                    b.Property<int>("CountryId")
+                    b.Property<int?>("CountryId")
                         .HasColumnType("int");
 
                     b.Property<int>("Experience")
@@ -674,8 +674,7 @@ namespace WorkoutPlanner.Migrations
                     b.HasOne("WorkoutPlanner.Models.Country", "Country")
                         .WithMany("Trainers")
                         .HasForeignKey("CountryId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Country");
                 });

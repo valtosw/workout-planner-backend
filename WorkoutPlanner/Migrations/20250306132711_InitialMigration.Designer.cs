@@ -12,7 +12,7 @@ using WorkoutPlanner.Data;
 namespace WorkoutPlanner.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250305193712_InitialMigration")]
+    [Migration("20250306132711_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -473,7 +473,7 @@ namespace WorkoutPlanner.Migrations
                     b.Property<string>("City")
                         .HasColumnType("longtext");
 
-                    b.Property<int>("CountryId")
+                    b.Property<int?>("CountryId")
                         .HasColumnType("int");
 
                     b.Property<int>("Experience")
@@ -677,8 +677,7 @@ namespace WorkoutPlanner.Migrations
                     b.HasOne("WorkoutPlanner.Models.Country", "Country")
                         .WithMany("Trainers")
                         .HasForeignKey("CountryId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Country");
                 });
