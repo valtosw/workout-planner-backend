@@ -24,10 +24,10 @@ namespace WorkoutPlanner.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(new { message = "Wrong register credentials", errors = ModelState });
 
-            if (await userManager.FindByEmailAsync(request.Email) != null)
+            if (await userManager.FindByEmailAsync(request.Email) is not null)
                 return BadRequest(new { message = "A user with this email already exists." });
 
-            ApplicationUser user = null;
+            ApplicationUser user;
 
             if (request.Role.Equals("customer", StringComparison.CurrentCultureIgnoreCase))
             {
@@ -146,11 +146,11 @@ namespace WorkoutPlanner.Controllers
 
             var accessToken = jwtService.GenerateAccessToken(claims);
 
-            var newRefreshToken = jwtService.GenerateRefreshToken(claims/*new List<Claim> { new Claim(ClaimTypes.Email, user.Email) }*/);
+            var newRefreshToken = jwtService.GenerateRefreshToken(claims);
 
             var existingToken = user.RefreshTokens.FirstOrDefault(rt => rt.Token == refreshToken);
 
-            if (existingToken is not null)
+            if (existingToken != null)
                 existingToken.Token = newRefreshToken;
 
             await context.SaveChangesAsync();
