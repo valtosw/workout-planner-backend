@@ -20,7 +20,6 @@ namespace WorkoutPlanner.Models
 
         public ICollection<Customer> Customers { get; set; } = [];
         public ICollection<TrainerRequest> ReceivedRequests { get; set; } = [];
-        public ICollection<WorkoutPlan> WorkoutPlans { get; set; } = [];
         public Country? Country { get; set; }
     }
 }

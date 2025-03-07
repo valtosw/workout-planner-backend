@@ -15,5 +15,6 @@ namespace WorkoutPlanner.Models
         public string? ProfilePicture { get; set; }
 
         public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
+        public ICollection<WorkoutPlan> WorkoutPlans { get; set; } = [];
     }
 }

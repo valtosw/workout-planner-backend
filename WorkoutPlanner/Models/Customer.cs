@@ -7,6 +7,5 @@ namespace WorkoutPlanner.Models
         public ICollection<Trainer> Trainers { get; set; } = [];
         public ICollection<TrainerRequest> SentRequests { get; set; } = [];
         public ICollection<ProgressLog> ProgressLogs { get; set; } = [];
-        public ICollection<WorkoutPlan> WorkoutPlans { get; set; } = [];
     }
 }
