@@ -12,7 +12,7 @@ using WorkoutPlanner.Data;
 namespace WorkoutPlanner.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250306132711_InitialMigration")]
+    [Migration("20250307090438_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -410,16 +410,11 @@ namespace WorkoutPlanner.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("varchar(50)");
 
-                    b.Property<string>("TrainerId")
-                        .HasColumnType("varchar(255)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AssignedToId");
 
                     b.HasIndex("CreatedById");
-
-                    b.HasIndex("TrainerId");
 
                     b.ToTable("WorkoutPlans");
                 });
@@ -634,19 +629,15 @@ namespace WorkoutPlanner.Migrations
             modelBuilder.Entity("WorkoutPlanner.Models.WorkoutPlan", b =>
                 {
                     b.HasOne("WorkoutPlanner.Models.Customer", "AssignedTo")
-                        .WithMany("WorkoutPlans")
+                        .WithMany()
                         .HasForeignKey("AssignedToId")
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("WorkoutPlanner.Models.ApplicationUser", "CreatedBy")
-                        .WithMany()
-                        .HasForeignKey("CreatedById")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("WorkoutPlanner.Models.Trainer", null)
                         .WithMany("WorkoutPlans")
-                        .HasForeignKey("TrainerId");
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("AssignedTo");
 
@@ -685,6 +676,8 @@ namespace WorkoutPlanner.Migrations
             modelBuilder.Entity("WorkoutPlanner.Models.ApplicationUser", b =>
                 {
                     b.Navigation("RefreshTokens");
+
+                    b.Navigation("WorkoutPlans");
                 });
 
             modelBuilder.Entity("WorkoutPlanner.Models.Country", b =>
@@ -714,15 +707,11 @@ namespace WorkoutPlanner.Migrations
                     b.Navigation("ProgressLogs");
 
                     b.Navigation("SentRequests");
-
-                    b.Navigation("WorkoutPlans");
                 });
 
             modelBuilder.Entity("WorkoutPlanner.Models.Trainer", b =>
                 {
                     b.Navigation("ReceivedRequests");
-
-                    b.Navigation("WorkoutPlans");
                 });
 #pragma warning restore 612, 618
         }

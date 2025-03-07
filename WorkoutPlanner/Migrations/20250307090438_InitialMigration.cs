@@ -368,8 +368,6 @@ namespace WorkoutPlanner.Migrations
                     CreatedById = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     AssignedToId = table.Column<string>(type: "varchar(255)", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    TrainerId = table.Column<string>(type: "varchar(255)", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
@@ -386,12 +384,7 @@ namespace WorkoutPlanner.Migrations
                         column: x => x.CreatedById,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_WorkoutPlans_AspNetUsers_TrainerId",
-                        column: x => x.TrainerId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -551,11 +544,6 @@ namespace WorkoutPlanner.Migrations
                 name: "IX_WorkoutPlans_CreatedById",
                 table: "WorkoutPlans",
                 column: "CreatedById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_WorkoutPlans_TrainerId",
-                table: "WorkoutPlans",
-                column: "TrainerId");
         }
 
         /// <inheritdoc />
