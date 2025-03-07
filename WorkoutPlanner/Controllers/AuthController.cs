@@ -179,11 +179,14 @@ namespace WorkoutPlanner.Controllers
             var existingToken = user.RefreshTokens.FirstOrDefault(rt => rt.Token == refreshToken);
 
             if (existingToken != null)
+            {
                 user.RefreshTokens.Remove(existingToken);
+                context.RefreshTokens.Remove(existingToken);
+            }            
 
             await context.SaveChangesAsync();
 
-            Response.Cookies.Delete("refresh");
+            Response.Cookies.Delete("jwt");
 
             return Ok(new { Message = "User logged out successfully." });
         }
