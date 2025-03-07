@@ -88,15 +88,17 @@ namespace WorkoutPlanner.Data
                 .WithOne(wpe => wpe.Exercise)
                 .HasForeignKey(wpe => wpe.ExerciseId);
 
+            // WorkoutPlan - ApplicationUser many-to-one relationship
             modelBuilder.Entity<WorkoutPlan>()
                 .HasOne(wp => wp.CreatedBy)
-                .WithMany()
+                .WithMany(cb => cb.WorkoutPlans)
                 .HasForeignKey(wp => wp.CreatedById)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
+            // WorkoutPlan - Customer many-to-one relationship
             modelBuilder.Entity<WorkoutPlan>()
                .HasOne(wp => wp.AssignedTo)
-               .WithMany(c => c.WorkoutPlans)
+               .WithMany()
                .HasForeignKey(wp => wp.AssignedToId)
                .OnDelete(DeleteBehavior.SetNull);
         }
