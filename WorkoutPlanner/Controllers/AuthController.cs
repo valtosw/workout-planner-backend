@@ -2,9 +2,12 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using NuGet.DependencyResolver;
 using System.Security.Claims;
+using System.Text;
 using WorkoutPlanner.Data;
 using WorkoutPlanner.Models;
 using WorkoutPlanner.Models.AuthModels;
@@ -15,7 +18,11 @@ namespace WorkoutPlanner.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController(AppDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, JwtService jwtService) : ControllerBase
+    public class AuthController(AppDbContext context, 
+        UserManager<ApplicationUser> userManager, 
+        RoleManager<IdentityRole> roleManager, 
+        JwtService jwtService, 
+        EmailService emailService) : ControllerBase
     {
         [Route("Register")]
         [HttpPost]
@@ -73,7 +80,45 @@ namespace WorkoutPlanner.Controllers
 
             await userManager.AddClaimsAsync(user, claims);
 
+            var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+            var code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+
+            var confirmationLink = $"http://localhost:5173/confirm-email?email={user.Email}&code={code}";
+
+            await emailService.SendEmailConfirmationAsync(user.Email, confirmationLink);
+
             return Created(user.Email, new { Message = "User registered successfully." });
+        }
+
+        [Route("ConfirmEmail")]
+        [HttpPost]
+        public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailDto request)
+        {
+            var user = await userManager.FindByEmailAsync(request.Email);
+            if (user is null)
+                return BadRequest(new { message = "User not found." });
+
+            var token = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Code));
+            var result = await userManager.ConfirmEmailAsync(user, token);
+
+            return result.Succeeded ? 
+                Ok(new { Message = "Email confirmed successfully." }) 
+                : BadRequest(new { Message = "Email confirmation failed." });
+        }
+
+        [Route("CheckEmailConfirmation")]
+        [HttpPost]
+        public async Task<IActionResult> CheckEmailConfirmation([FromBody] string email)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new { message = "Wrong data", errors = ModelState });
+
+            var user = await userManager.FindByEmailAsync(email);
+
+            if (user is null)
+                return BadRequest(new { message = "User not found." });
+
+            return Ok(new { IsEmailConfirmed = await userManager.IsEmailConfirmedAsync(user) });
         }
 
         [Route("Login")]
@@ -91,10 +136,10 @@ namespace WorkoutPlanner.Controllers
             if (!await userManager.CheckPasswordAsync(user, request.Password))
                 return Unauthorized(new { message = "Wrong login or password." });
 
-            //if (!await userManager.IsEmailConfirmedAsync(user))
-            //{
-            //    return Unauthorized(new { message = "Email not confirmed." });
-            //}
+            if (!await userManager.IsEmailConfirmedAsync(user))
+            {
+                return Unauthorized(new { message = "Email not confirmed." });
+            }
 
             var claims = userManager.GetClaimsAsync(user).Result.ToList();
 
