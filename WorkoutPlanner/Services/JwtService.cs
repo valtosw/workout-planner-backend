@@ -12,10 +12,6 @@ namespace WorkoutPlanner.Services
 
         public string GenerateAccessToken(IEnumerable<Claim> claims)
         {
-            foreach (Claim claim in claims)
-            {
-                Console.WriteLine($"GAT: Claim Type: {claim.Type}, Claim Value: {claim.Value}");
-            }
             return GenerateJwtToken(claims, _jwtSettings.AccessTokenSecret, TimeSpan.FromSeconds(_jwtSettings.AccessTokenExpiryInSeconds));
         }
 
@@ -28,12 +24,6 @@ namespace WorkoutPlanner.Services
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            foreach (Claim claim in claims)
-            {
-                Console.WriteLine($"GJWTT: Claim Type: {claim.Type}, Claim Value: {claim.Value}");
-            }
-
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
