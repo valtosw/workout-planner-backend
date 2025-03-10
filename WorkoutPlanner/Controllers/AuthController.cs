@@ -87,7 +87,7 @@ namespace WorkoutPlanner.Controllers
 
             await emailService.SendEmailConfirmationAsync(user.Email, confirmationLink);
 
-            return Created(user.Email, new { Message = "User registered successfully." });
+            return Created(user.Email, new { Message = "Please check your email for a confirmation link." });
         }
 
         [Route("ConfirmEmail")]
