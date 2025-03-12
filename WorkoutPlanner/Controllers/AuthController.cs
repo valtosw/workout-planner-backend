@@ -108,17 +108,18 @@ namespace WorkoutPlanner.Controllers
 
         [Route("CheckEmailConfirmation")]
         [HttpPost]
-        public async Task<IActionResult> CheckEmailConfirmation([FromBody] string email)
+        public async Task<bool> CheckEmailConfirmation([FromBody] CheckEmailDto request)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(new { message = "Wrong data", errors = ModelState });
+            try
+            {
+                var user = await userManager.FindByEmailAsync(request.Email);
 
-            var user = await userManager.FindByEmailAsync(email);
-
-            if (user is null)
-                return BadRequest(new { message = "User not found." });
-
-            return Ok(new { IsEmailConfirmed = await userManager.IsEmailConfirmedAsync(user) });
+                return user is not null && await userManager.IsEmailConfirmedAsync(user);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         [Route("Login")]
