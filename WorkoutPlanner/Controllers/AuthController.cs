@@ -248,7 +248,8 @@ namespace WorkoutPlanner.Controllers
             if (user is null)
                 return BadRequest(new { message = "User not found." });
 
-            var code = await userManager.GeneratePasswordResetTokenAsync(user);
+            var token = await userManager.GeneratePasswordResetTokenAsync(user);
+            var code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
             var resetLink = $"http://localhost:5173/reset-password?email={user.Email}&code={code}";
 
@@ -268,7 +269,8 @@ namespace WorkoutPlanner.Controllers
             if (user is null)
                 return BadRequest(new { message = "User not found." });
 
-            var result = await userManager.ResetPasswordAsync(user, request.Code, request.NewPassword);
+            var token = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(request.Code));
+            var result = await userManager.ResetPasswordAsync(user, token, request.NewPassword);
 
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
