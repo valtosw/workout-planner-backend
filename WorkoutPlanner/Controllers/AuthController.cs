@@ -236,5 +236,44 @@ namespace WorkoutPlanner.Controllers
 
             return Ok(new { Message = "User logged out successfully." });
         }
+
+        [Route("ForgotPassword")]
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new { message = "Wrong forgot password credentials", errors = ModelState });
+
+            var user = await userManager.FindByEmailAsync(request.Email);
+            if (user is null)
+                return BadRequest(new { message = "User not found." });
+
+            var code = await userManager.GeneratePasswordResetTokenAsync(user);
+
+            var resetLink = $"http://localhost:5173/reset-password?email={user.Email}&code={code}";
+
+            await emailService.SendRestorePasswordAsync(user.Email, resetLink);
+
+            return Ok(new { Message = "Password reset link sent to email." });
+        }
+
+        [Route("ResetPassword")]
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new { message = "Wrong reset password data.", errors = ModelState });
+
+            var user = await userManager.FindByEmailAsync(request.Email);
+            if (user is null)
+                return BadRequest(new { message = "User not found." });
+
+            var result = await userManager.ResetPasswordAsync(user, request.Code, request.NewPassword);
+
+            if (!result.Succeeded)
+                return BadRequest(result.Errors);
+
+            return Ok(new { Message = "Password reset successful." });
+        }
     }
 }
