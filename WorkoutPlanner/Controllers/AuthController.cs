@@ -131,15 +131,12 @@ namespace WorkoutPlanner.Controllers
 
             var user = await userManager.FindByEmailAsync(request.Email);
 
-            if (user is null)
-                return BadRequest(new { message = "User not found." });
-
-            if (!await userManager.CheckPasswordAsync(user, request.Password))
-                return Unauthorized(new { message = "Wrong login or password." });
+            if (user is null || !await userManager.CheckPasswordAsync(user, request.Password))
+                return Unauthorized(new { message = "You have entered an invalid email or password." });
 
             if (!await userManager.IsEmailConfirmedAsync(user))
             {
-                return Unauthorized(new { message = "Email not confirmed." });
+                return Unauthorized(new { message = "Your email is not confirmed yet." });
             }
 
             var claims = userManager.GetClaimsAsync(user).Result.ToList();
