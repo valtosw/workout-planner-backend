@@ -12,6 +12,8 @@ namespace WorkoutPlanner.Models
         [MaxLength(50)]
         public required string LastName { get; set; }
 
+        public string FullName => $"{FirstName} {LastName}";
+
         public string? ProfilePicture { get; set; }
 
         public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
