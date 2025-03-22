@@ -4,12 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using WorkoutPlanner.Data;
 using WorkoutPlanner.Models;
 using WorkoutPlanner.Models.DTOs;
+using WorkoutPlanner.Services;
 
 namespace WorkoutPlanner.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class WorkoutPlanController(AppDbContext context) : ControllerBase
+    public class WorkoutPlanController(AppDbContext context, PdfService pdfService) : ControllerBase
     {
         [HttpGet("UserWorkoutPlans/{id}")]
         public async Task<IEnumerable<WorkoutPlanDto>> GetUserWorkoutPlans(string id)
@@ -50,6 +51,25 @@ namespace WorkoutPlanner.Controllers
                 .ToListAsync();
 
             return workoutPlans.Count == 0 ? [] : workoutPlans;
+        }
+
+        [HttpGet("{id}/DownloadPdf")]
+        public async Task<IActionResult> DownloadWorkoutPlanPdf(int id)
+        {
+            var workoutPlan = await context.WorkoutPlans
+                .Include(w => w.CreatedBy)
+                .Include(w => w.AssignedTo)
+                .Include(w => w.WorkoutPlanEntries)
+                .ThenInclude(e => e.Exercise)
+                .FirstOrDefaultAsync(w => w.Id == id);
+
+            if (workoutPlan == null)
+                return NotFound("Workout plan not found");
+
+            string logoPath = Path.Combine(Directory.GetCurrentDirectory(), "Datasets", "apple-logo-transparent.png");
+            var pdfBytes = pdfService.GenerateWorkoutPlanPdf(workoutPlan, logoPath);
+
+            return File(pdfBytes, "application/pdf", $"{workoutPlan.Name}.pdf");
         }
     }
 }
