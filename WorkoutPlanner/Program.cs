@@ -45,6 +45,8 @@ builder.Services.Configure<IdentityOptions>(options =>
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailService"));
 builder.Services.AddScoped<EmailService>();
 
+builder.Services.AddScoped<PdfService>();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigins", policy =>
