@@ -19,5 +19,19 @@ namespace WorkoutPlanner.Controllers
 
             return muscleGroup is null ? [] : muscleGroup.Exercises.Select(e => e.Name);
         }
+
+        [HttpGet("MostLoggedExercises/{id}")]
+        public async Task<IEnumerable<string>> GetMostLoggedExercises(string id, int limit = 20)
+        {
+            var topExercises = await context.ProgressLogs
+                .Where(pl => pl.CustomerId == id)
+                .GroupBy(pl => pl.Exercise.Name)
+                .OrderByDescending(g => g.Count())
+                .Take(limit)
+                .Select(g => g.Key)
+                .ToListAsync();
+
+            return topExercises;
+        }
     }
 }
