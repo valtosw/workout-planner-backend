@@ -53,12 +53,15 @@ namespace WorkoutPlanner.Controllers
                 }
             }
 
-            var muscleGroupPercentages = muscleGroupCounts.ToDictionary(
+            double minCount = muscleGroupCounts.Values.Min();
+            double maxCount = muscleGroupCounts.Values.Max();
+
+            var normalizedValues = muscleGroupCounts.ToDictionary(
                 kvp => kvp.Key,
-                kvp => totalExercises > 0 ? Math.Round((kvp.Value / (double)totalExercises) * 100, 2) : 0
+                kvp => maxCount > minCount ? (kvp.Value - minCount) / (maxCount - minCount) : 0
             );
 
-            return muscleGroupPercentages;
+            return normalizedValues;
         }
     }
 }
