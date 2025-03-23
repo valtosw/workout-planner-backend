@@ -24,6 +24,7 @@ namespace WorkoutPlanner.Controllers
                 .Include(wp => wp.AssignedTo) 
                 .Select(wp => new WorkoutPlanDto
                 {
+                    Id = wp.Id,
                     Name = wp.Name,
                     CreatedBy = new CreatedByDto
                     {
@@ -54,22 +55,19 @@ namespace WorkoutPlanner.Controllers
         }
 
         [HttpGet("{id}/DownloadPdf")]
-        public async Task<IActionResult> DownloadWorkoutPlanPdf(int id)
+        public async Task<FileContentResult> DownloadWorkoutPlanPdf(int id)
         {
             var workoutPlan = await context.WorkoutPlans
-                .Include(w => w.CreatedBy)
-                .Include(w => w.AssignedTo)
-                .Include(w => w.WorkoutPlanEntries)
-                .ThenInclude(e => e.Exercise)
+                .Include(wp => wp.CreatedBy)
+                .Include(wp => wp.AssignedTo)
+                .Include(wp => wp.WorkoutPlanEntries)
+                    .ThenInclude(wpe => wpe.Exercise)
+                        .ThenInclude(e => e.MuscleGroup)
                 .FirstOrDefaultAsync(w => w.Id == id);
 
-            if (workoutPlan == null)
-                return NotFound("Workout plan not found");
+            var pdfBytes = pdfService.GenerateWorkoutPlanPdf(workoutPlan!);
 
-            string logoPath = Path.Combine(Directory.GetCurrentDirectory(), "Datasets", "apple-logo-transparent.png");
-            var pdfBytes = pdfService.GenerateWorkoutPlanPdf(workoutPlan, logoPath);
-
-            return File(pdfBytes, "application/pdf", $"{workoutPlan.Name}.pdf");
+            return File(pdfBytes, "application/pdf", $"{workoutPlan!.Name}.pdf");
         }
     }
 }
