@@ -6,7 +6,7 @@ namespace WorkoutPlanner.Services
 {
     public class PdfService
     {
-        public byte[] GenerateWorkoutPlanPdf(WorkoutPlan workoutPlan, string logoPath)
+        public byte[] GenerateWorkoutPlanPdf(WorkoutPlan workoutPlan)
         {
             using MemoryStream stream = new();
             Document document = new(PageSize.A4, 50, 50, 50, 50);
@@ -17,7 +17,9 @@ namespace WorkoutPlanner.Services
             Font sectionTitleFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 14, new BaseColor(44, 62, 80));
             Font normalFont = FontFactory.GetFont(FontFactory.HELVETICA, 12, BaseColor.DarkGray);
             Font tableHeaderFont = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12, BaseColor.White);
-            BaseColor tableHeaderColor = new(52, 152, 219); // Light Blue
+            BaseColor tableHeaderColor = BaseColor.Black;
+
+            string logoPath = Path.Combine(Directory.GetCurrentDirectory(), "Icons", "icon.svg");
 
             if (!string.IsNullOrEmpty(logoPath) && File.Exists(logoPath))
             {
@@ -52,7 +54,6 @@ namespace WorkoutPlanner.Services
             PdfPTable table = new(4) { WidthPercentage = 100 };
             table.SetWidths(new float[] { 3, 3, 2, 2 });
 
-            // Table Header
             string[] headers = { "Exercise", "Muscle Group", "Sets x Reps", "Weight (kg)" };
             foreach (string header in headers)
             {
@@ -68,7 +69,7 @@ namespace WorkoutPlanner.Services
             foreach (var entry in workoutPlan.WorkoutPlanEntries)
             {
                 table.AddCell(new PdfPCell(new Phrase(entry.Exercise.Name, normalFont)) { Padding = 6 });
-                //table.AddCell(new PdfPCell(new Phrase(entry.Exercise.MuscleGroup.Name, normalFont)) { Padding = 6 }); TO FIX: NULLREFERENCE
+                table.AddCell(new PdfPCell(new Phrase(entry.Exercise.MuscleGroup.Name, normalFont)) { Padding = 6 });
                 table.AddCell(new PdfPCell(new Phrase($"{entry.Sets} x {entry.Reps}", normalFont)) { Padding = 6, HorizontalAlignment = Element.ALIGN_CENTER });
                 table.AddCell(new PdfPCell(new Phrase($"{entry.Weight} kg", normalFont)) { Padding = 6, HorizontalAlignment = Element.ALIGN_CENTER });
             }
