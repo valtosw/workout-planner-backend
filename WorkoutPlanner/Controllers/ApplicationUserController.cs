@@ -11,11 +11,23 @@ namespace WorkoutPlanner.Controllers
     public class ApplicationUserController(AppDbContext context) : ControllerBase
     {
         [HttpGet("{id}")]
-        public async Task<ActionResult<ApplicationUser>> GetUserById(string id)
+        public async Task<ApplicationUser> GetUserById(string id)
         {
             var user = await context.Users
                 .FirstOrDefaultAsync(u => u.Id == id);
-            return user is null ? NotFound() : Ok(user);
+            return user!;
+        }
+
+        [HttpGet("Role/{id}")]
+        public async Task<string> GetUserRoleById(string id)
+        {
+            var userRoleRow = await context.UserRoles
+                .FirstOrDefaultAsync(ur => ur.UserId == id);
+
+            var userRole = await context.Roles
+                .FirstOrDefaultAsync(r => r.Id == userRoleRow!.RoleId);
+
+            return userRole!.Name!;
         }
     }
 }
