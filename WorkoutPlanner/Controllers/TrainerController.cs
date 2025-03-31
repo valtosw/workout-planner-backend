@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using System.Collections;
 using System.Linq;
 using System.Threading.Tasks;
 using WorkoutPlanner.Data;
 using WorkoutPlanner.Helpers;
 using WorkoutPlanner.Models;
+using WorkoutPlanner.Models.DTOs;
 
 namespace WorkoutPlanner.Controllers
 {
@@ -87,6 +89,23 @@ namespace WorkoutPlanner.Controllers
                 .MaxAsync(t => t.Experience);
 
             return maxExperience;
+        }
+
+        [HttpGet("PersonalCustomers/{id}")]
+        public async Task<IEnumerable<CustomerDto>> GetPersonalCustomersById(string id)
+        {
+            var customers = await context.Trainers
+                .Where(t => t.Id == id)
+                .SelectMany(t => t.Customers)
+                .Select(c => new CustomerDto
+                {
+                    Id = c.Id,
+                    FirstName = c.FirstName,
+                    LastName = c.LastName,
+                    ProfilePicture = c.ProfilePicture
+                }).ToListAsync();
+
+            return customers ?? [];
         }
     }
 }
