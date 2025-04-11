@@ -17,7 +17,7 @@ namespace WorkoutPlanner.Controllers
             var request = await context.TrainerRequests
                 .FirstOrDefaultAsync(r => r.CustomerId == customerId && r.TrainerId == trainerId);
             
-            return request is null ? "No request found" :  request.RequestStatus.ToString();
+            return request is null ? "No Request Found" :  request.RequestStatus.ToString();
         }
 
         [HttpPost("SendRequest/{customerId}/{trainerId}")]
