@@ -8,8 +8,6 @@ namespace WorkoutPlanner.Datasets
     {
         public static (List<MuscleGroup>, List<Exercise>) GetMuscleGroupAndExerciseData(string filePath)
         {
-
-
             var muscleGroupsDict = new Dictionary<string, MuscleGroup>();
             var exercises = new List<Exercise>();
 
