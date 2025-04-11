@@ -14,5 +14,6 @@
         public string? InstagramLink { get; set; }
         public string? FacebookLink { get; set; }
         public string? TelegramLink { get; set; }
+        public bool IsPosted { get; set; }
     }
 }
