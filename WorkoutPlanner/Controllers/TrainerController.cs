@@ -34,7 +34,8 @@ namespace WorkoutPlanner.Controllers
                     Bio = t.Bio,
                     InstagramLink = t.InstagramLink,
                     FacebookLink = t.FacebookLink,
-                    TelegramLink = t.TelegramLink
+                    TelegramLink = t.TelegramLink,
+                    IsPosted = t.IsPosted,
                 }).FirstOrDefaultAsync();
             return trainer ?? new TrainerInfoDto();
         }
@@ -196,6 +197,19 @@ namespace WorkoutPlanner.Controllers
                 }).ToListAsync();
 
             return customers ?? [];
+        }
+
+        [HttpPut("UpdatePost/{id}")]
+        public async Task UpdatePost(string id)
+        {
+            var trainer = await context.Trainers
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (trainer is not null)
+            {
+                trainer.IsPosted = !trainer.IsPosted;
+                await context.SaveChangesAsync();
+            }   
         }
     }
 }
