@@ -143,7 +143,6 @@ namespace WorkoutPlanner.Controllers
 
             var recentLogs = logs.Select(log => new ProgressLogDto
             {
-                MuscleGroupName = log.Exercise.MuscleGroup.Name,
                 ExerciseName = log.Exercise.Name,
                 LogDate = log.LogDate,
                 Weight = log.Weight
@@ -159,7 +158,8 @@ namespace WorkoutPlanner.Controllers
 
             var exercise = await context.Exercises
                 .Include(e => e.MuscleGroup)
-                .FirstOrDefaultAsync(e => e.Name == progressLogDto.ExerciseName && e.MuscleGroup.Name == progressLogDto.MuscleGroupName);
+                .FirstOrDefaultAsync(e => e.Name == progressLogDto.ExerciseName);
+
 
             var progressLog = new ProgressLog
             {
