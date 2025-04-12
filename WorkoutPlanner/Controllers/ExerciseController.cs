@@ -33,5 +33,15 @@ namespace WorkoutPlanner.Controllers
 
             return topExercises;
         }
+
+        [HttpGet("AllExercises")]
+        public async Task<IEnumerable<string>> GetAllExercises()
+        {
+            var exercises = await context.Exercises
+                .Select(e => e.Name)
+                .ToListAsync();
+
+            return exercises;
+        }
     }
 }
