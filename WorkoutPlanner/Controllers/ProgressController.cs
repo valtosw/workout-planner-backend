@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using SendGrid.Helpers.Mail;
 using SkiaSharp;
 using WorkoutPlanner.Data;
+using WorkoutPlanner.Models;
 using WorkoutPlanner.Models.DTOs;
 
 namespace WorkoutPlanner.Controllers
@@ -123,6 +124,53 @@ namespace WorkoutPlanner.Controllers
             }
 
             return [];
+        }
+
+        [HttpGet("RecentLogs/{id}")]
+        public async Task<IEnumerable<ProgressLogDto>> GetRecentLogsById(string id)
+        {
+            var logs = await context.ProgressLogs
+                .Include(log => log.Exercise)
+                    .ThenInclude(exercise => exercise.MuscleGroup)
+                .Where(log => log.CustomerId == id)
+                .OrderByDescending(log => log.LogDate)
+                .ToListAsync();
+
+            if (logs is null || logs.Count == 0)
+            {
+                return [];
+            }
+
+            var recentLogs = logs.Select(log => new ProgressLogDto
+            {
+                MuscleGroupName = log.Exercise.MuscleGroup.Name,
+                ExerciseName = log.Exercise.Name,
+                LogDate = log.LogDate,
+                Weight = log.Weight
+            });
+
+            return recentLogs;
+        }
+
+        [HttpPost("LogProgress/{id}")]
+        public async Task LogProgress([FromBody] ProgressLogDto progressLogDto, string id)
+        {
+            var customer = await context.Customers.FindAsync(id);
+
+            var exercise = await context.Exercises
+                .Include(e => e.MuscleGroup)
+                .FirstOrDefaultAsync(e => e.Name == progressLogDto.ExerciseName && e.MuscleGroup.Name == progressLogDto.MuscleGroupName);
+
+            var progressLog = new ProgressLog
+            {
+                CustomerId = id,
+                ExerciseId = exercise!.Id,
+                LogDate = progressLogDto.LogDate,
+                Weight = progressLogDto.Weight
+            };
+
+            await context.ProgressLogs.AddAsync(progressLog);
+            await context.SaveChangesAsync();
         }
     }
 }
