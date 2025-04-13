@@ -21,13 +21,14 @@ namespace WorkoutPlanner.Controllers
                     .ThenInclude(wpe => wpe.Exercise)
                         .ThenInclude(e => e.MuscleGroup)
                 .Include(wp => wp.CreatedBy)
-                .Include(wp => wp.AssignedTo) 
+                .Include(wp => wp.AssignedTo)
                 .Select(wp => new WorkoutPlanDto
                 {
                     Id = wp.Id,
                     Name = wp.Name,
                     CreatedBy = new CreatedByDto
                     {
+                        //Id = wp.CreatedBy.Id,
                         FirstName = wp.CreatedBy.FirstName,
                         LastName = wp.CreatedBy.LastName,
                         Email = wp.CreatedBy.Email,
@@ -35,6 +36,7 @@ namespace WorkoutPlanner.Controllers
                     },
                     AssignedTo = wp.AssignedTo != null ? new AssignedToDto
                     {
+                        //Id = wp.AssignedTo.Id,
                         FirstName = wp.AssignedTo.FirstName,
                         LastName = wp.AssignedTo.LastName,
                         Email = wp.AssignedTo.Email,
@@ -68,6 +70,64 @@ namespace WorkoutPlanner.Controllers
             var pdfBytes = pdfService.GenerateWorkoutPlanPdf(workoutPlan!);
 
             return File(pdfBytes, "application/pdf", $"{workoutPlan!.Name}.pdf");
+        }
+
+        [HttpPost("CreateNewWorkoutPlan")]
+        public async Task CreateWorkoutPlan([FromBody] CreateWorkoutPlanDto createWorkoutPlanDto)
+        {
+            var createdBy = await context.Users.FirstOrDefaultAsync(u => u.Id == createWorkoutPlanDto.CreatedById);
+
+            Customer? assignedTo = null;
+
+            if (createWorkoutPlanDto.AssignedToId is not null)
+            {
+                assignedTo = await context.Customers.FirstOrDefaultAsync(c => c.Id == createWorkoutPlanDto.AssignedToId);
+            }
+
+            var workoutPlan = new WorkoutPlan
+            {
+                Name = createWorkoutPlanDto.Name,
+                CreatedById = createdBy!.Id,
+                CreatedBy = createdBy!,
+                AssignedToId = assignedTo?.Id,
+                AssignedTo = assignedTo,
+                WorkoutPlanEntries = []
+            };
+
+            foreach (var entryDto in createWorkoutPlanDto.WorkoutPlanEntries)
+            {
+                var exercise = await context.Exercises
+                    .FirstOrDefaultAsync(e =>
+                        e.Name == entryDto.Exercise);
+
+                var workoutEntry = new WorkoutPlanEntry
+                {
+                    Sets = entryDto.Sets,
+                    Reps = entryDto.Reps,
+                    Weight = entryDto.Weight,
+                    ExerciseId = exercise!.Id,
+                    Exercise = exercise
+                };
+
+                workoutPlan.WorkoutPlanEntries.Add(workoutEntry);
+            }
+
+            await context.WorkoutPlans.AddAsync(workoutPlan);
+            await context.SaveChangesAsync();
+        }
+
+        [HttpDelete("{id}")]
+        public async Task DeleteWorkoutPlan(int id)
+        {
+            var workoutPlan = await context.WorkoutPlans
+                .Include(wp => wp.WorkoutPlanEntries)
+                .FirstOrDefaultAsync(wp => wp.Id == id);
+            
+            if (workoutPlan is not null)
+            {
+                context.WorkoutPlans.Remove(workoutPlan);
+                await context.SaveChangesAsync();
+            }
         }
     }
 }
