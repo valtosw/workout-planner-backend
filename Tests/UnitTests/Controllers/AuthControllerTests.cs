@@ -16,13 +16,14 @@ using WorkoutPlanner.Services;
 
 namespace Tests.UnitTests.Controllers
 {
-    public class AuthControllerTests
+    public class AuthControllerTests : IDisposable
     {
         private readonly Mock<UserManager<ApplicationUser>> _mockUserManager;
         private readonly Mock<RoleManager<IdentityRole>> _mockRoleManager;
         private readonly Mock<JwtService> _mockJwtService;
         private readonly Mock<EmailService> _mockEmailService;
         private readonly AuthController _controller;
+        private readonly AppDbContext _context;
 
         public AuthControllerTests()
         {
@@ -33,8 +34,6 @@ namespace Tests.UnitTests.Controllers
                     {"Jwt:RefreshTokenSecret", "test_refresh_secret"},
                     {"Jwt:Issuer", "test.com"},
                     {"Jwt:Audience", "test.com"},
-                    {"Jwt:AccessTokenExpiryInSeconds", "60"},
-                    {"Jwt:RefreshTokenExpiryInSeconds", "120"},
                     {"EmailService:SendGridApiKey", "dummy-api-key-for-testing"},
                     {"EmailService:SenderEmail", "test@test.com"}
                 })
@@ -49,13 +48,13 @@ namespace Tests.UnitTests.Controllers
             var options = new DbContextOptionsBuilder<AppDbContext>()
                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                .Options;
-            var mockDbContext = new Mock<AppDbContext>(options);
+            _context = new AppDbContext(options);
 
             _mockJwtService = new Mock<JwtService>(configuration);
             _mockEmailService = new Mock<EmailService>(configuration);
 
             _controller = new AuthController(
-                mockDbContext.Object,
+                _context,
                 _mockUserManager.Object,
                 _mockRoleManager.Object,
                 _mockJwtService.Object,
@@ -68,6 +67,10 @@ namespace Tests.UnitTests.Controllers
             };
         }
 
+        public void Dispose()
+        {
+            _context.Dispose();
+        }
 
         [Fact]
         public async Task Register_WithValidData_ReturnsCreated()
@@ -109,13 +112,14 @@ namespace Tests.UnitTests.Controllers
         {
             // Arrange
             var loginDto = new LoginDto { Email = "test@example.com", Password = "Password123" };
-            var user = new ApplicationUser { Email = loginDto.Email, FirstName = "Test", LastName = "User" };
+            var user = new ApplicationUser { Id = "test-user-id", Email = loginDto.Email, FirstName = "Test", LastName = "User" };
             var claims = new List<Claim> { new(ClaimTypes.Email, loginDto.Email) };
 
             _mockUserManager.Setup(um => um.FindByEmailAsync(loginDto.Email)).ReturnsAsync(user);
             _mockUserManager.Setup(um => um.CheckPasswordAsync(user, loginDto.Password)).ReturnsAsync(true);
             _mockUserManager.Setup(um => um.IsEmailConfirmedAsync(user)).ReturnsAsync(true);
             _mockUserManager.Setup(um => um.GetClaimsAsync(user)).ReturnsAsync(claims);
+
             _mockJwtService.Setup(js => js.GenerateAccessToken(It.IsAny<IEnumerable<Claim>>())).Returns("access-token");
             _mockJwtService.Setup(js => js.GenerateRefreshToken(It.IsAny<IEnumerable<Claim>>())).Returns("refresh-token");
 
@@ -126,6 +130,9 @@ namespace Tests.UnitTests.Controllers
             var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
             okResult.Value.Should().BeEquivalentTo(new { AccessToken = "access-token" });
             _controller.Response.Headers["Set-Cookie"].ToString().Should().Contain("jwt=refresh-token");
+
+            _context.RefreshTokens.Should().HaveCount(1);
+            _context.RefreshTokens.First().UserId.Should().Be("test-user-id");
         }
 
         [Fact]

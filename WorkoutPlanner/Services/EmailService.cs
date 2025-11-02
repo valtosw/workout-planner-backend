@@ -6,7 +6,7 @@ namespace WorkoutPlanner.Services
 {
     public class EmailService(IConfiguration configuration)
     {
-        public async Task SendEmailConfirmationAsync(string email, string confirmationLink)
+        public virtual async Task SendEmailConfirmationAsync(string email, string confirmationLink)
         {
             var client = new SendGridClient(configuration["EmailService:SendGridApiKey"]);
             var from = new EmailAddress(configuration["EmailService:SenderEmail"], "Workout Planner");
@@ -94,7 +94,7 @@ namespace WorkoutPlanner.Services
             await client.SendEmailAsync(msg);
         }
 
-        public async Task SendRestorePasswordAsync(string email, string resetLink)
+        public virtual async Task SendRestorePasswordAsync(string email, string resetLink)
         {
             var client = new SendGridClient(configuration["EmailService:SendGridApiKey"]);
             var from = new EmailAddress(configuration["EmailService:SenderEmail"], "Workout Planner");
