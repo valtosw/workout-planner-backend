@@ -10,12 +10,12 @@ namespace WorkoutPlanner.Services
     {
         private readonly JwtSettings _jwtSettings = configuration.GetSection("Jwt").Get<JwtSettings>();
 
-        public string GenerateAccessToken(IEnumerable<Claim> claims)
+        public virtual string GenerateAccessToken(IEnumerable<Claim> claims)
         {
             return GenerateJwtToken(claims, _jwtSettings.AccessTokenSecret, TimeSpan.FromSeconds(_jwtSettings.AccessTokenExpiryInSeconds));
         }
 
-        public string GenerateRefreshToken(IEnumerable<Claim> claims)
+        public virtual string GenerateRefreshToken(IEnumerable<Claim> claims)
         {
             return GenerateJwtToken(claims, _jwtSettings.RefreshTokenSecret, TimeSpan.FromSeconds(_jwtSettings.RefreshTokenExpiryInSeconds));
         }
@@ -39,12 +39,12 @@ namespace WorkoutPlanner.Services
 
             return tokenHandler.WriteToken(token);
         }
-        public ClaimsPrincipal? ValidateAccessToken(string token)
+        public virtual ClaimsPrincipal? ValidateAccessToken(string token)
         {
             return ValidateJwtToken(token, _jwtSettings.AccessTokenSecret);
         }
 
-        public ClaimsPrincipal? ValidateRefreshToken(string token)
+        public virtual ClaimsPrincipal? ValidateRefreshToken(string token)
         {
             return ValidateJwtToken(token, _jwtSettings.RefreshTokenSecret);
         }
