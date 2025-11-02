@@ -5,15 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Moq;
 using System.Security.Claims;
 using System.Text;
 using WorkoutPlanner.Controllers;
 using WorkoutPlanner.Data;
 using WorkoutPlanner.Models;
-using WorkoutPlanner.Models.AuthModels;
 using WorkoutPlanner.Models.DTOs.AuthDTOs;
 using WorkoutPlanner.Services;
 
